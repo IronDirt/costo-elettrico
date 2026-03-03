@@ -749,6 +749,18 @@
 
   // ── Init ───────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
+    loadPersistedState();
+    document.documentElement.lang = lang;
+    document.getElementById('btn-lang-it').classList.toggle('active', lang === 'it');
+    document.getElementById('btn-lang-en').classList.toggle('active', lang === 'en');
+    document.getElementById('btn-lang-it').setAttribute('aria-pressed', String(lang === 'it'));
+    document.getElementById('btn-lang-en').setAttribute('aria-pressed', String(lang === 'en'));
+    document.getElementById('currency').value     = state.currency     || 'CHF';
+    document.getElementById('tariff').value       = state.tariff       ?? 0.25;
+    document.getElementById('unit-display').value = state.unitDisplay  || 'both';
+    document.querySelectorAll('#period-tabs button').forEach(b => {
+      b.classList.toggle('active', b.dataset.period === state.period);
+    });
     document.getElementById('currency').addEventListener('change', e => {
       state.currency = e.target.value;
       refresh();
@@ -805,6 +817,7 @@
     renderSummary();
     renderTable();
     renderStats();
+    persistState();
   }
 
   function renderSummary() {
@@ -937,6 +950,35 @@
 
     state.appliances[i] = { name, power, unit, hours };
     refresh();
+  }
+
+  // ── Auto-persist to localStorage ──────────────────────
+  function persistState() {
+    try {
+      localStorage.setItem('costo-elettrico-state', JSON.stringify(state));
+      localStorage.setItem('lang', lang);
+    } catch {}
+  }
+
+  function loadPersistedState() {
+    try {
+      const savedLang = localStorage.getItem('lang');
+      if (savedLang === 'it' || savedLang === 'en') lang = savedLang;
+      const saved = localStorage.getItem('costo-elettrico-state');
+      if (!saved) return;
+      const parsed = JSON.parse(saved);
+      if (!parsed.appliances || !Array.isArray(parsed.appliances)) return;
+      const VALID_CURRENCIES = ['CHF', 'EUR'];
+      const VALID_UNITS      = ['both', 'w', 'kw'];
+      const VALID_PERIODS    = ['minute', 'hour', 'day', 'week', 'month', 'year'];
+      state = {
+        currency:    VALID_CURRENCIES.includes(parsed.currency)   ? parsed.currency   : state.currency,
+        tariff:      (typeof parsed.tariff === 'number' && parsed.tariff >= 0) ? parsed.tariff : state.tariff,
+        unitDisplay: VALID_UNITS.includes(parsed.unitDisplay)     ? parsed.unitDisplay : state.unitDisplay,
+        period:      VALID_PERIODS.includes(parsed.period)        ? parsed.period      : state.period,
+        appliances:  parsed.appliances
+      };
+    } catch {}
   }
 
   // ── Save / Load ────────────────────────────────────────
