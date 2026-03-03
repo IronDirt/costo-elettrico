@@ -29,6 +29,10 @@
       background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
       color: #fff;
       padding: 1.2rem 1.5rem;
+    }
+    header .inner-wrap {
+      max-width: 960px;
+      margin: 0 auto;
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -43,6 +47,8 @@
       padding: 1rem 1.5rem;
     }
     #summary-bar .summary-row {
+      max-width: 960px;
+      margin: 0 auto;
       display: flex;
       flex-wrap: wrap;
       gap: 1.5rem;
@@ -273,8 +279,10 @@
 <body>
 
 <header>
-  <span>⚡</span>
-  <h1>Costo Elettrico</h1>
+  <div class="inner-wrap">
+    <span>⚡</span>
+    <h1>Costo Elettrico</h1>
+  </div>
 </header>
 
 <!-- Summary bar -->
