@@ -268,6 +268,21 @@
       font-size: 0.88rem;
     }
 
+    /* ── Language switcher ── */
+    .lang-switch { display: flex; gap: 0.3rem; margin-left: auto; }
+    .lang-btn {
+      background: transparent;
+      border: 1.5px solid rgba(255,255,255,0.45);
+      color: #fff;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-weight: 700;
+      transition: background 0.2s;
+    }
+    .lang-btn.active, .lang-btn:hover { background: rgba(255,255,255,0.2); }
+
     footer {
       text-align: center;
       padding: 1.5rem;
@@ -282,6 +297,10 @@
   <div class="inner-wrap">
     <span>⚡</span>
     <h1>Costo Elettrico</h1>
+    <div class="lang-switch">
+      <button id="btn-lang-it" class="lang-btn active" onclick="setLang('it')" aria-label="Italiano" aria-pressed="true">IT</button>
+      <button id="btn-lang-en" class="lang-btn" onclick="setLang('en')" aria-label="English" aria-pressed="false">EN</button>
+    </div>
   </div>
 </header>
 
@@ -289,16 +308,16 @@
 <div id="summary-bar">
   <div class="summary-row">
     <div>
-      <div class="total-label">Costo totale</div>
+      <div class="total-label" data-i18n="total-label">Costo totale</div>
       <div class="total-cost" id="total-display">0.00 CHF</div>
     </div>
     <div class="period-tabs" id="period-tabs">
-      <button data-period="minute">Minuto</button>
-      <button data-period="hour">Ora</button>
-      <button data-period="day" class="active">Giorno</button>
-      <button data-period="week">Settimana</button>
-      <button data-period="month">Mese</button>
-      <button data-period="year">Anno</button>
+      <button data-period="minute" data-i18n="tab-minute">Minuto</button>
+      <button data-period="hour" data-i18n="tab-hour">Ora</button>
+      <button data-period="day" class="active" data-i18n="tab-day">Giorno</button>
+      <button data-period="week" data-i18n="tab-week">Settimana</button>
+      <button data-period="month" data-i18n="tab-month">Mese</button>
+      <button data-period="year" data-i18n="tab-year">Anno</button>
     </div>
   </div>
 </div>
@@ -307,25 +326,25 @@
 
   <!-- Settings -->
   <div class="card">
-    <h2>⚙️ Impostazioni</h2>
+    <h2 data-i18n="settings-title">⚙️ Impostazioni</h2>
     <div class="settings-grid">
       <div class="field">
-        <label>Valuta</label>
+        <label data-i18n="label-currency">Valuta</label>
         <select id="currency">
-          <option value="CHF">CHF (Franco svizzero)</option>
-          <option value="EUR">EUR (Euro)</option>
+          <option value="CHF" data-i18n="opt-chf">CHF (Franco svizzero)</option>
+          <option value="EUR" data-i18n="opt-eur">EUR (Euro)</option>
         </select>
       </div>
       <div class="field">
-        <label>Prezzo per kWh</label>
-        <input type="number" id="tariff" min="0" step="0.001" value="0.25" placeholder="es. 0.25" />
+        <label data-i18n="label-tariff">Prezzo per kWh</label>
+        <input type="number" id="tariff" min="0" step="0.001" value="0.25" data-i18n-placeholder="placeholder-tariff" placeholder="es. 0.25" />
       </div>
       <div class="field">
-        <label>Unità di visualizzazione</label>
+        <label data-i18n="label-unit-display">Unità di visualizzazione</label>
         <select id="unit-display">
-          <option value="both">W e kW</option>
-          <option value="w">Solo W</option>
-          <option value="kw">Solo kW</option>
+          <option value="both" data-i18n="opt-both">W e kW</option>
+          <option value="w" data-i18n="opt-w">Solo W</option>
+          <option value="kw" data-i18n="opt-kw">Solo kW</option>
         </select>
       </div>
     </div>
@@ -333,30 +352,30 @@
 
   <!-- Add appliance -->
   <div class="card">
-    <h2>➕ Aggiungi apparecchio</h2>
+    <h2 data-i18n="add-title">➕ Aggiungi apparecchio</h2>
     <div class="add-form">
       <div class="field">
-        <label>Nome apparecchio</label>
-        <input type="text" id="add-name" placeholder="es. Lavatrice" />
+        <label data-i18n="label-name">Nome apparecchio</label>
+        <input type="text" id="add-name" data-i18n-placeholder="placeholder-name" placeholder="es. Lavatrice" />
       </div>
       <div class="field">
-        <label>Potenza</label>
-        <input type="number" id="add-power" min="0" step="0.01" placeholder="es. 1500" />
+        <label data-i18n="label-power">Potenza</label>
+        <input type="number" id="add-power" min="0" step="0.01" data-i18n-placeholder="placeholder-power" placeholder="es. 1500" />
       </div>
       <div class="field">
-        <label>Unità</label>
+        <label data-i18n="label-unit">Unità</label>
         <select id="add-unit">
           <option value="W">W</option>
           <option value="kW">kW</option>
         </select>
       </div>
       <div class="field">
-        <label>Ore/giorno</label>
-        <input type="number" id="add-hours" min="0" max="24" step="0.5" value="1" placeholder="es. 2" />
+        <label data-i18n="label-hours">Ore/giorno</label>
+        <input type="number" id="add-hours" min="0" max="24" step="0.5" value="1" data-i18n-placeholder="placeholder-hours" placeholder="es. 2" />
       </div>
       <div class="field btn-add">
         <label>&nbsp;</label>
-        <button class="btn btn-primary" onclick="addAppliance()">Aggiungi</button>
+        <button class="btn btn-primary" onclick="addAppliance()" data-i18n="btn-add">Aggiungi</button>
       </div>
     </div>
   </div>
@@ -364,18 +383,18 @@
   <!-- Appliance list -->
   <div class="card">
     <div class="appliances-header">
-      <h2 style="margin-bottom:0">📋 Apparecchi</h2>
+      <h2 style="margin-bottom:0" data-i18n="appliances-title">📋 Apparecchi</h2>
       <span id="appliance-count" style="font-size:0.8rem;color:var(--muted)"></span>
     </div>
     <div class="table-wrap">
       <table id="appliance-table">
         <thead>
           <tr>
-            <th>Nome</th>
-            <th>Potenza</th>
-            <th>Ore/gg</th>
+            <th data-i18n="th-name">Nome</th>
+            <th data-i18n="th-power">Potenza</th>
+            <th data-i18n="th-hours">Ore/gg</th>
             <th id="cost-col-header">Costo/giorno</th>
-            <th>Azioni</th>
+            <th data-i18n="th-actions">Azioni</th>
           </tr>
         </thead>
         <tbody id="appliance-body">
@@ -387,36 +406,36 @@
 
   <!-- Statistics -->
   <div class="card">
-    <h2>📊 Statistiche</h2>
+    <h2 data-i18n="stats-title">📊 Statistiche</h2>
     <div class="stats-grid" id="stats-grid">
       <div class="stat-card">
         <div class="stat-icon">⚡</div>
-        <div class="stat-label">Consumo totale</div>
+        <div class="stat-label" data-i18n="stat-label-kw">Consumo totale</div>
         <div class="stat-value" id="stat-total-kw">0 kW</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">💰</div>
-        <div class="stat-label">Costo al mese</div>
+        <div class="stat-label" data-i18n="stat-label-monthly">Costo al mese</div>
         <div class="stat-value" id="stat-monthly">0.00</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">📅</div>
-        <div class="stat-label">Costo all'anno</div>
+        <div class="stat-label" data-i18n="stat-label-yearly">Costo all'anno</div>
         <div class="stat-value" id="stat-yearly">0.00</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">🏆</div>
-        <div class="stat-label">Più costoso</div>
+        <div class="stat-label" data-i18n="stat-label-top">Più costoso</div>
         <div class="stat-value" id="stat-top">—</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">🌿</div>
-        <div class="stat-label">CO₂/anno (est.)</div>
+        <div class="stat-label" data-i18n="stat-label-co2">CO₂/anno (est.)</div>
         <div class="stat-value" id="stat-co2">0 kg</div>
       </div>
       <div class="stat-card">
         <div class="stat-icon">⏱️</div>
-        <div class="stat-label">Costo medio/ora</div>
+        <div class="stat-label" data-i18n="stat-label-avg">Costo medio/ora</div>
         <div class="stat-value" id="stat-avg-hour">0.00</div>
       </div>
     </div>
@@ -424,10 +443,10 @@
 
   <!-- Save / Load -->
   <div class="card">
-    <h2>💾 Salva / Carica configurazione</h2>
+    <h2 data-i18n="save-title">💾 Salva / Carica configurazione</h2>
     <div class="io-row">
-      <button class="btn btn-success" onclick="saveConfig()">⬇ Scarica configurazione</button>
-      <button class="btn btn-outline" onclick="document.getElementById('file-input').click()">⬆ Carica configurazione</button>
+      <button class="btn btn-success" onclick="saveConfig()" data-i18n="btn-save">⬇ Scarica configurazione</button>
+      <button class="btn btn-outline" onclick="document.getElementById('file-input').click()" data-i18n="btn-load">⬆ Carica configurazione</button>
       <input type="file" id="file-input" accept=".json" onchange="loadConfig(event)" />
       <span id="load-msg" style="font-size:0.82rem;color:var(--muted)"></span>
     </div>
@@ -435,7 +454,7 @@
 
 </div>
 
-<footer>⚡ Costo Elettrico — tutti i calcoli sono effettuati localmente nel browser</footer>
+<footer data-i18n="footer">⚡ Costo Elettrico — tutti i calcoli sono effettuati localmente nel browser</footer>
 
 <script>
   // ── State ──────────────────────────────────────────────
@@ -447,6 +466,157 @@
     appliances: []
   };
 
+  // ── i18n ───────────────────────────────────────────────
+  let lang = 'it';
+
+  const TRANSLATIONS = {
+    it: {
+      'total-label':        'Costo totale',
+      'tab-minute':         'Minuto',
+      'tab-hour':           'Ora',
+      'tab-day':            'Giorno',
+      'tab-week':           'Settimana',
+      'tab-month':          'Mese',
+      'tab-year':           'Anno',
+      'settings-title':     '⚙️ Impostazioni',
+      'label-currency':     'Valuta',
+      'opt-chf':            'CHF (Franco svizzero)',
+      'opt-eur':            'EUR (Euro)',
+      'label-tariff':       'Prezzo per kWh',
+      'placeholder-tariff': 'es. 0.25',
+      'label-unit-display': 'Unità di visualizzazione',
+      'opt-both':           'W e kW',
+      'opt-w':              'Solo W',
+      'opt-kw':             'Solo kW',
+      'add-title':          '➕ Aggiungi apparecchio',
+      'label-name':         'Nome apparecchio',
+      'placeholder-name':   'es. Lavatrice',
+      'label-power':        'Potenza',
+      'placeholder-power':  'es. 1500',
+      'label-unit':         'Unità',
+      'label-hours':        'Ore/giorno',
+      'placeholder-hours':  'es. 2',
+      'btn-add':            'Aggiungi',
+      'appliances-title':   '📋 Apparecchi',
+      'th-name':            'Nome',
+      'th-power':           'Potenza',
+      'th-hours':           'Ore/gg',
+      'th-actions':         'Azioni',
+      'cost-prefix':        'Costo',
+      'no-data':            'Nessun apparecchio aggiunto',
+      'stats-title':        '📊 Statistiche',
+      'stat-label-kw':      'Consumo totale',
+      'stat-label-monthly': 'Costo al mese',
+      'stat-label-yearly':  "Costo all'anno",
+      'stat-label-top':     'Più costoso',
+      'stat-label-co2':     'CO₂/anno (est.)',
+      'stat-label-avg':     'Costo medio/ora',
+      'save-title':         '💾 Salva / Carica configurazione',
+      'btn-save':           '⬇ Scarica configurazione',
+      'btn-load':           '⬆ Carica configurazione',
+      'footer':             '⚡ Costo Elettrico — tutti i calcoli sono effettuati localmente nel browser',
+      'period-minute':      'minuto',
+      'period-hour':        'ora',
+      'period-day':         'giorno',
+      'period-week':        'settimana',
+      'period-month':       'mese',
+      'period-year':        'anno',
+      'count-one':          'apparecchio',
+      'count-many':         'apparecchi',
+      'alert-name':         "Inserisci il nome dell'apparecchio.",
+      'alert-power':        'Inserisci una potenza valida.',
+      'alert-hours':        'Inserisci ore/giorno valide (0–24).',
+      'confirm-delete':     name => `Rimuovere "${name}"?`,
+      'msg-loaded':         name => `✅ "${name}" caricato!`,
+      'msg-invalid':        '❌ File non valido.',
+      'err-config':         'Configurazione non valida: array "appliances" mancante o non corretto',
+    },
+    en: {
+      'total-label':        'Total cost',
+      'tab-minute':         'Minute',
+      'tab-hour':           'Hour',
+      'tab-day':            'Day',
+      'tab-week':           'Week',
+      'tab-month':          'Month',
+      'tab-year':           'Year',
+      'settings-title':     '⚙️ Settings',
+      'label-currency':     'Currency',
+      'opt-chf':            'CHF (Swiss franc)',
+      'opt-eur':            'EUR (Euro)',
+      'label-tariff':       'Price per kWh',
+      'placeholder-tariff': 'e.g. 0.25',
+      'label-unit-display': 'Display unit',
+      'opt-both':           'W and kW',
+      'opt-w':              'W only',
+      'opt-kw':             'kW only',
+      'add-title':          '➕ Add appliance',
+      'label-name':         'Appliance name',
+      'placeholder-name':   'e.g. Washing machine',
+      'label-power':        'Power',
+      'placeholder-power':  'e.g. 1500',
+      'label-unit':         'Unit',
+      'label-hours':        'Hours/day',
+      'placeholder-hours':  'e.g. 2',
+      'btn-add':            'Add',
+      'appliances-title':   '📋 Appliances',
+      'th-name':            'Name',
+      'th-power':           'Power',
+      'th-hours':           'h/day',
+      'th-actions':         'Actions',
+      'cost-prefix':        'Cost',
+      'no-data':            'No appliances added',
+      'stats-title':        '📊 Statistics',
+      'stat-label-kw':      'Total consumption',
+      'stat-label-monthly': 'Monthly cost',
+      'stat-label-yearly':  'Yearly cost',
+      'stat-label-top':     'Most expensive',
+      'stat-label-co2':     'CO₂/year (est.)',
+      'stat-label-avg':     'Avg cost/hour',
+      'save-title':         '💾 Save / Load configuration',
+      'btn-save':           '⬇ Download configuration',
+      'btn-load':           '⬆ Upload configuration',
+      'footer':             '⚡ Electrical Cost — all calculations are performed locally in the browser',
+      'period-minute':      'minute',
+      'period-hour':        'hour',
+      'period-day':         'day',
+      'period-week':        'week',
+      'period-month':       'month',
+      'period-year':        'year',
+      'count-one':          'appliance',
+      'count-many':         'appliances',
+      'alert-name':         'Enter the appliance name.',
+      'alert-power':        'Enter a valid power.',
+      'alert-hours':        'Enter valid hours/day (0–24).',
+      'confirm-delete':     name => `Remove "${name}"?`,
+      'msg-loaded':         name => `✅ "${name}" loaded!`,
+      'msg-invalid':        '❌ Invalid file.',
+      'err-config':         'Invalid configuration: "appliances" array missing or incorrect',
+    }
+  };
+
+  // t() returns a string for most keys; some keys map to functions for dynamic strings (e.g. confirm dialogs)
+  function t(key) { return TRANSLATIONS[lang][key] ?? key; }
+
+  function setLang(l) {
+    lang = l;
+    document.documentElement.lang = l;
+    document.getElementById('btn-lang-it').classList.toggle('active', l === 'it');
+    document.getElementById('btn-lang-en').classList.toggle('active', l === 'en');
+    document.getElementById('btn-lang-it').setAttribute('aria-pressed', String(l === 'it'));
+    document.getElementById('btn-lang-en').setAttribute('aria-pressed', String(l === 'en'));
+    applyTranslations();
+    refresh();
+  }
+
+  function applyTranslations() {
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+  }
+
   // ── Multipliers: how many "periods" in a day ───────────
   const PERIOD_MULT = {
     minute: 1 / (24 * 60),
@@ -455,10 +625,6 @@
     week:   7,
     month:  30.44,  // 365.25 / 12 — accounts for leap years
     year:   365.25
-  };
-  const PERIOD_LABEL = {
-    minute: 'minuto', hour: 'ora', day: 'giorno',
-    week: 'settimana', month: 'mese', year: 'anno'
   };
 
   // CO₂ emission factor: avg EU grid ~0.233 kg/kWh (stima indicativa — varia per regione/paese)
@@ -486,6 +652,7 @@
         refresh();
       });
     });
+    applyTranslations();
     refresh();
   });
 
@@ -535,15 +702,15 @@
     const tbody = document.getElementById('appliance-body');
     const mult  = PERIOD_MULT[state.period];
     const header = document.getElementById('cost-col-header');
-    header.textContent = `Costo/${PERIOD_LABEL[state.period]}`;
+    header.textContent = `${t('cost-prefix')}/${t('period-' + state.period)}`;
 
     document.getElementById('appliance-count').textContent =
       state.appliances.length
-        ? `${state.appliances.length} apparecch${state.appliances.length === 1 ? 'io' : 'i'}`
+        ? `${state.appliances.length} ${state.appliances.length === 1 ? t('count-one') : t('count-many')}`
         : '';
 
     if (!state.appliances.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="no-data">Nessun apparecchio aggiunto</td></tr>';
+      tbody.innerHTML = `<tr><td colspan="5" class="no-data">${t('no-data')}</td></tr>`;
       return;
     }
 
@@ -593,9 +760,9 @@
 
   // ── CRUD ───────────────────────────────────────────────
   function validateApplianceFields(name, power, hours) {
-    if (!name)                                   { alert('Inserisci il nome dell\'apparecchio.'); return false; }
-    if (!power || power <= 0)                    { alert('Inserisci una potenza valida.'); return false; }
-    if (isNaN(hours) || hours < 0 || hours > 24) { alert('Inserisci ore/giorno valide (0–24).'); return false; }
+    if (!name)                                   { alert(t('alert-name')); return false; }
+    if (!power || power <= 0)                    { alert(t('alert-power')); return false; }
+    if (isNaN(hours) || hours < 0 || hours > 24) { alert(t('alert-hours')); return false; }
     return true;
   }
 
@@ -615,7 +782,7 @@
   }
 
   function deleteAppliance(i) {
-    if (!confirm(`Rimuovere "${state.appliances[i].name}"?`)) return;
+    if (!confirm(t('confirm-delete')(state.appliances[i].name))) return;
     state.appliances.splice(i, 1);
     refresh();
   }
@@ -674,7 +841,7 @@
     reader.onload = e => {
       try {
         const loaded = JSON.parse(e.target.result);
-        if (!loaded.appliances || !Array.isArray(loaded.appliances)) throw new Error('Configurazione non valida: array "appliances" mancante o non corretto');
+        if (!loaded.appliances || !Array.isArray(loaded.appliances)) throw new Error(t('err-config'));
         state = loaded;
         // Sync UI controls
         document.getElementById('currency').value     = state.currency     || 'CHF';
@@ -683,10 +850,10 @@
         document.querySelectorAll('#period-tabs button').forEach(b => {
           b.classList.toggle('active', b.dataset.period === state.period);
         });
-        document.getElementById('load-msg').textContent = `✅ "${file.name}" caricato!`;
+        document.getElementById('load-msg').textContent = t('msg-loaded')(file.name);
         refresh();
       } catch {
-        document.getElementById('load-msg').textContent = '❌ File non valido.';
+        document.getElementById('load-msg').textContent = t('msg-invalid');
       }
     };
     reader.readAsText(file);
