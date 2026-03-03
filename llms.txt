@@ -1,0 +1,25 @@
+# Costo Elettrico
+
+> Strumento web gratuito per calcolare il costo elettrico degli apparecchi domestici.
+
+Costo Elettrico è un calcolatore online che permette di stimare la spesa energetica di qualsiasi apparecchio domestico. L'utente inserisce la potenza (in W o kW) e le ore di utilizzo giornaliero, e l'app mostra il costo per minuto, ora, giorno, settimana, mese e anno in base alla tariffa kWh impostata.
+
+## Funzionalità principali
+
+- Calcolo del costo elettrico per diversi periodi (minuto, ora, giorno, settimana, mese, anno)
+- Supporto valute EUR (Euro) e CHF (Franco svizzero)
+- Tariffa kWh completamente personalizzabile
+- Statistiche aggregate: consumo totale, apparecchio più costoso, emissioni CO₂ stimate, costo medio orario
+- Modifica inline degli apparecchi direttamente nella tabella
+- Esportazione e importazione della configurazione in formato JSON
+- Interfaccia disponibile in italiano e inglese
+- Funziona completamente offline nel browser (nessuna dipendenza esterna)
+
+## URL
+
+- Sito: https://costo-elettrico.salernohub.net/
+
+## Tecnologie
+
+- HTML5, CSS3, JavaScript vanilla
+- Nessuna dipendenza esterna né server richiesto
