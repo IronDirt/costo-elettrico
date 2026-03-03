@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Costo Elettrico</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --bg: #f1f5f9;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+      color: #fff;
+      padding: 1.2rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    header h1 { font-size: 1.5rem; font-weight: 700; }
+    header span { font-size: 1.8rem; }
+
+    /* ── Summary banner ── */
+    #summary-bar {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      color: #fff;
+      padding: 1rem 1.5rem;
+    }
+    #summary-bar .summary-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    #summary-bar .period-tabs {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+    #summary-bar .period-tabs button {
+      padding: 0.3rem 0.8rem;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: transparent;
+      color: #fff;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: background 0.2s;
+    }
+    #summary-bar .period-tabs button.active,
+    #summary-bar .period-tabs button:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    .total-cost {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .total-label { font-size: 0.85rem; color: #94a3b8; }
+
+    /* ── Main layout ── */
+    .container {
+      max-width: 960px;
+      margin: 1.5rem auto;
+      padding: 0 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .card h2 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* ── Settings row ── */
+    .settings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+    }
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .field input, .field select {
+      width: 100%;
+      padding: 0.55rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      color: var(--text);
+      background: #f8fafc;
+      transition: border-color 0.2s;
+    }
+    .field input:focus, .field select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: #fff;
+    }
+
+    /* ── Add appliance form ── */
+    .add-form {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 0.75rem;
+      align-items: end;
+    }
+    @media (max-width: 640px) {
+      .add-form { grid-template-columns: 1fr 1fr; }
+      .add-form .btn-add { grid-column: 1 / -1; }
+    }
+
+    .btn {
+      padding: 0.55rem 1.1rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-danger  { background: var(--danger);  color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--primary);
+      color: var(--primary);
+    }
+
+    /* ── Appliance table ── */
+    .appliances-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+    thead th {
+      background: #f1f5f9;
+      padding: 0.6rem 0.8rem;
+      text-align: left;
+      font-weight: 700;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody td { padding: 0.6rem 0.8rem; vertical-align: middle; }
+    tbody td.cost-cell { font-weight: 700; color: var(--primary); }
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 20px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .badge-w  { background: #dbeafe; color: #1d4ed8; }
+    .badge-kw { background: #fef3c7; color: #92400e; }
+
+    .btn-icon {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      margin-left: 0.25rem;
+    }
+    .no-data {
+      text-align: center;
+      color: var(--muted);
+      padding: 2rem;
+      font-style: italic;
+    }
+
+    /* ── Statistics ── */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+    .stat-card {
+      background: #f8fafc;
+      border-radius: 10px;
+      padding: 1rem;
+      border: 1.5px solid var(--border);
+    }
+    .stat-card .stat-icon { font-size: 1.4rem; }
+    .stat-card .stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-top: 0.4rem;
+    }
+    .stat-card .stat-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text);
+      margin-top: 0.2rem;
+    }
+
+    /* ── Save/Load ── */
+    .io-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    .io-row input[type="file"] { display: none; }
+
+    /* ── Inline edit ── */
+    .edit-input {
+      width: 100%;
+      padding: 0.3rem 0.5rem;
+      border: 1.5px solid var(--primary);
+      border-radius: 6px;
+      font-size: 0.88rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <span>⚡</span>
+  <h1>Costo Elettrico</h1>
+</header>
+
+<!-- Summary bar -->
+<div id="summary-bar">
+  <div class="summary-row">
+    <div>
+      <div class="total-label">Costo totale</div>
+      <div class="total-cost" id="total-display">0.00 CHF</div>
+    </div>
+    <div class="period-tabs" id="period-tabs">
+      <button data-period="minute">Minuto</button>
+      <button data-period="hour">Ora</button>
+      <button data-period="day" class="active">Giorno</button>
+      <button data-period="week">Settimana</button>
+      <button data-period="month">Mese</button>
+      <button data-period="year">Anno</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Settings -->
+  <div class="card">
+    <h2>⚙️ Impostazioni</h2>
+    <div class="settings-grid">
+      <div class="field">
+        <label>Valuta</label>
+        <select id="currency">
+          <option value="CHF">CHF (Franco svizzero)</option>
+          <option value="EUR">EUR (Euro)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Prezzo per kWh</label>
+        <input type="number" id="tariff" min="0" step="0.001" value="0.25" placeholder="es. 0.25" />
+      </div>
+      <div class="field">
+        <label>Unità di visualizzazione</label>
+        <select id="unit-display">
+          <option value="both">W e kW</option>
+          <option value="w">Solo W</option>
+          <option value="kw">Solo kW</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add appliance -->
+  <div class="card">
+    <h2>➕ Aggiungi apparecchio</h2>
+    <div class="add-form">
+      <div class="field">
+        <label>Nome apparecchio</label>
+        <input type="text" id="add-name" placeholder="es. Lavatrice" />
+      </div>
+      <div class="field">
+        <label>Potenza</label>
+        <input type="number" id="add-power" min="0" step="0.01" placeholder="es. 1500" />
+      </div>
+      <div class="field">
+        <label>Unità</label>
+        <select id="add-unit">
+          <option value="W">W</option>
+          <option value="kW">kW</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Ore/giorno</label>
+        <input type="number" id="add-hours" min="0" max="24" step="0.5" value="1" placeholder="es. 2" />
+      </div>
+      <div class="field btn-add">
+        <label>&nbsp;</label>
+        <button class="btn btn-primary" onclick="addAppliance()">Aggiungi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Appliance list -->
+  <div class="card">
+    <div class="appliances-header">
+      <h2 style="margin-bottom:0">📋 Apparecchi</h2>
+      <span id="appliance-count" style="font-size:0.8rem;color:var(--muted)"></span>
+    </div>
+    <div class="table-wrap">
+      <table id="appliance-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Potenza</th>
+            <th>Ore/gg</th>
+            <th id="cost-col-header">Costo/giorno</th>
+            <th>Azioni</th>
+          </tr>
+        </thead>
+        <tbody id="appliance-body">
+          <tr><td colspan="5" class="no-data">Nessun apparecchio aggiunto</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="card">
+    <h2>📊 Statistiche</h2>
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">⚡</div>
+        <div class="stat-label">Consumo totale</div>
+        <div class="stat-value" id="stat-total-kw">0 kW</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Costo al mese</div>
+        <div class="stat-value" id="stat-monthly">0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-label">Costo all'anno</div>
+        <div class="stat-value" id="stat-yearly">0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-label">Più costoso</div>
+        <div class="stat-value" id="stat-top">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🌿</div>
+        <div class="stat-label">CO₂/anno (est.)</div>
+        <div class="stat-value" id="stat-co2">0 kg</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏱️</div>
+        <div class="stat-label">Costo medio/ora</div>
+        <div class="stat-value" id="stat-avg-hour">0.00</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save / Load -->
+  <div class="card">
+    <h2>💾 Salva / Carica configurazione</h2>
+    <div class="io-row">
+      <button class="btn btn-success" onclick="saveConfig()">⬇ Scarica configurazione</button>
+      <button class="btn btn-outline" onclick="document.getElementById('file-input').click()">⬆ Carica configurazione</button>
+      <input type="file" id="file-input" accept=".json" onchange="loadConfig(event)" />
+      <span id="load-msg" style="font-size:0.82rem;color:var(--muted)"></span>
+    </div>
+  </div>
+
+</div>
+
+<footer>⚡ Costo Elettrico — tutti i calcoli sono effettuati localmente nel browser</footer>
+
+<script>
+  // ── State ──────────────────────────────────────────────
+  let state = {
+    currency: 'CHF',
+    tariff: 0.25,
+    unitDisplay: 'both',
+    period: 'day',
+    appliances: []
+  };
+
+  // ── Multipliers: how many "periods" in a day ───────────
+  const PERIOD_MULT = {
+    minute: 1 / (24 * 60),
+    hour:   1 / 24,
+    day:    1,
+    week:   7,
+    month:  30.44,  // 365.25 / 12 — accounts for leap years
+    year:   365.25
+  };
+  const PERIOD_LABEL = {
+    minute: 'minuto', hour: 'ora', day: 'giorno',
+    week: 'settimana', month: 'mese', year: 'anno'
+  };
+
+  // CO₂ emission factor: avg EU grid ~0.233 kg/kWh (stima indicativa — varia per regione/paese)
+  const CO2_FACTOR = 0.233;
+
+  // ── Init ───────────────────────────────────────────────
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('currency').addEventListener('change', e => {
+      state.currency = e.target.value;
+      refresh();
+    });
+    document.getElementById('tariff').addEventListener('input', e => {
+      state.tariff = parseFloat(e.target.value) || 0;
+      refresh();
+    });
+    document.getElementById('unit-display').addEventListener('change', e => {
+      state.unitDisplay = e.target.value;
+      refresh();
+    });
+    document.querySelectorAll('#period-tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.period = btn.dataset.period;
+        document.querySelectorAll('#period-tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        refresh();
+      });
+    });
+    refresh();
+  });
+
+  // ── Helpers ────────────────────────────────────────────
+  function toKW(power, unit) {
+    return unit === 'kW' ? power : power / 1000;
+  }
+
+  function fmt(value) {
+    return value.toLocaleString('it-CH', { minimumFractionDigits: 2, maximumFractionDigits: 4 });
+  }
+
+  function fmtPower(kw) {
+    const w = kw * 1000;
+    if (state.unitDisplay === 'w')  return `${w.toLocaleString('it-CH')} W`;
+    if (state.unitDisplay === 'kw') return `${kw.toLocaleString('it-CH', {maximumFractionDigits:3})} kW`;
+    return `${w.toLocaleString('it-CH')} W / ${kw.toLocaleString('it-CH', {maximumFractionDigits:3})} kW`;
+  }
+
+  /** Cost per day for one appliance (kWh/day × tariff) */
+  function costPerDay(app) {
+    const kw = toKW(app.power, app.unit);
+    return kw * app.hours * state.tariff;
+  }
+
+  /** Total daily cost across all appliances */
+  function totalDailyCost() {
+    return state.appliances.reduce((s, a) => s + costPerDay(a), 0);
+  }
+
+  // ── Render ─────────────────────────────────────────────
+  function refresh() {
+    renderSummary();
+    renderTable();
+    renderStats();
+  }
+
+  function renderSummary() {
+    const daily = totalDailyCost();
+    const mult  = PERIOD_MULT[state.period];
+    const total = daily * mult;
+    document.getElementById('total-display').textContent =
+      `${fmt(total)} ${state.currency}`;
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('appliance-body');
+    const mult  = PERIOD_MULT[state.period];
+    const header = document.getElementById('cost-col-header');
+    header.textContent = `Costo/${PERIOD_LABEL[state.period]}`;
+
+    document.getElementById('appliance-count').textContent =
+      state.appliances.length
+        ? `${state.appliances.length} apparecch${state.appliances.length === 1 ? 'io' : 'i'}`
+        : '';
+
+    if (!state.appliances.length) {
+      tbody.innerHTML = '<tr><td colspan="5" class="no-data">Nessun apparecchio aggiunto</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = state.appliances.map((app, i) => {
+      const kw     = toKW(app.power, app.unit);
+      const cost   = costPerDay(app) * mult;
+      const badge  = app.unit === 'kW'
+        ? `<span class="badge badge-kw">kW</span>`
+        : `<span class="badge badge-w">W</span>`;
+      return `
+        <tr>
+          <td>${escHtml(app.name)}</td>
+          <td>${fmtPower(kw)} ${badge}</td>
+          <td>${app.hours} h</td>
+          <td class="cost-cell">${fmt(cost)} ${state.currency}</td>
+          <td>
+            <button class="btn btn-outline btn-icon" onclick="startEdit(${i})">✏️</button>
+            <button class="btn btn-danger  btn-icon" onclick="deleteAppliance(${i})">🗑️</button>
+          </td>
+        </tr>`;
+    }).join('');
+  }
+
+  function renderStats() {
+    const daily   = totalDailyCost();
+    const monthly = daily * PERIOD_MULT.month;
+    const yearly  = daily * PERIOD_MULT.year;
+    const totalKw = state.appliances.reduce((s, a) => s + toKW(a.power, a.unit), 0);
+    const avgHour = daily / 24;
+    const co2year = totalKw * 24 * 365.25 * CO2_FACTOR; // kg
+
+    let topName = '—';
+    if (state.appliances.length) {
+      const top = state.appliances.reduce((a, b) => costPerDay(a) >= costPerDay(b) ? a : b);
+      topName = escHtml(top.name);
+    }
+
+    document.getElementById('stat-total-kw').textContent =
+      `${(totalKw).toLocaleString('it-CH', {maximumFractionDigits:3})} kW`;
+    document.getElementById('stat-monthly').textContent  = `${fmt(monthly)} ${state.currency}`;
+    document.getElementById('stat-yearly').textContent   = `${fmt(yearly)} ${state.currency}`;
+    document.getElementById('stat-top').textContent      = topName;
+    document.getElementById('stat-co2').textContent      =
+      `${co2year.toLocaleString('it-CH', {maximumFractionDigits:1})} kg`;
+    document.getElementById('stat-avg-hour').textContent = `${fmt(avgHour)} ${state.currency}`;
+  }
+
+  // ── CRUD ───────────────────────────────────────────────
+  function validateApplianceFields(name, power, hours) {
+    if (!name)                                   { alert('Inserisci il nome dell\'apparecchio.'); return false; }
+    if (!power || power <= 0)                    { alert('Inserisci una potenza valida.'); return false; }
+    if (isNaN(hours) || hours < 0 || hours > 24) { alert('Inserisci ore/giorno valide (0–24).'); return false; }
+    return true;
+  }
+
+  function addAppliance() {
+    const name  = document.getElementById('add-name').value.trim();
+    const power = parseFloat(document.getElementById('add-power').value);
+    const unit  = document.getElementById('add-unit').value;
+    const hours = parseFloat(document.getElementById('add-hours').value);
+
+    if (!validateApplianceFields(name, power, hours)) return;
+
+    state.appliances.push({ name, power, unit, hours });
+    document.getElementById('add-name').value  = '';
+    document.getElementById('add-power').value = '';
+    document.getElementById('add-hours').value = '1';
+    refresh();
+  }
+
+  function deleteAppliance(i) {
+    if (!confirm(`Rimuovere "${state.appliances[i].name}"?`)) return;
+    state.appliances.splice(i, 1);
+    refresh();
+  }
+
+  function startEdit(i) {
+    const app = state.appliances[i];
+    const tbody = document.getElementById('appliance-body');
+    const rows = tbody.querySelectorAll('tr');
+    const row  = rows[i];
+
+    row.innerHTML = `
+      <td><input class="edit-input" id="ei-name"  value="${escAttr(app.name)}" /></td>
+      <td>
+        <input class="edit-input" id="ei-power" type="number" min="0" step="0.01" value="${app.power}" style="width:80px" />
+        <select class="edit-input" id="ei-unit" style="width:60px">
+          <option value="W"  ${app.unit==='W'  ? 'selected':''}>W</option>
+          <option value="kW" ${app.unit==='kW' ? 'selected':''}>kW</option>
+        </select>
+      </td>
+      <td><input class="edit-input" id="ei-hours" type="number" min="0" max="24" step="0.5" value="${app.hours}" style="width:60px" /></td>
+      <td>—</td>
+      <td>
+        <button class="btn btn-success btn-icon" onclick="saveEdit(${i})">✔</button>
+        <button class="btn btn-outline  btn-icon" onclick="refresh()">✖</button>
+      </td>`;
+  }
+
+  function saveEdit(i) {
+    const name  = document.getElementById('ei-name').value.trim();
+    const power = parseFloat(document.getElementById('ei-power').value);
+    const unit  = document.getElementById('ei-unit').value;
+    const hours = parseFloat(document.getElementById('ei-hours').value);
+
+    if (!validateApplianceFields(name, power, hours)) return;
+
+    state.appliances[i] = { name, power, unit, hours };
+    refresh();
+  }
+
+  // ── Save / Load ────────────────────────────────────────
+  function saveConfig() {
+    const json = JSON.stringify(state, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = 'costo-elettrico.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function loadConfig(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        const loaded = JSON.parse(e.target.result);
+        if (!loaded.appliances || !Array.isArray(loaded.appliances)) throw new Error('Configurazione non valida: array "appliances" mancante o non corretto');
+        state = loaded;
+        // Sync UI controls
+        document.getElementById('currency').value     = state.currency     || 'CHF';
+        document.getElementById('tariff').value       = state.tariff       ?? 0.25;
+        document.getElementById('unit-display').value = state.unitDisplay  || 'both';
+        document.querySelectorAll('#period-tabs button').forEach(b => {
+          b.classList.toggle('active', b.dataset.period === state.period);
+        });
+        document.getElementById('load-msg').textContent = `✅ "${file.name}" caricato!`;
+        refresh();
+      } catch {
+        document.getElementById('load-msg').textContent = '❌ File non valido.';
+      }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+  }
+
+  // ── Security helpers ───────────────────────────────────
+  function escHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function escAttr(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/"/g, '&quot;');
+  }
+</script>
+</body>
+</html>
